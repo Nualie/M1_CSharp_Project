@@ -10,62 +10,77 @@ namespace TP1_CSharp
 {
     class Program
     {
-        static void Main(string[] args)
+        static void MainEx(string[] args)
         {
             ex5();
         }
 
-
-        static void LoadJson(string address)
-        {
-            try
+        static void displayTP1(Root myDeserializedClass)
+    {
+            Console.WriteLine("\nConfig");
+            foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(myDeserializedClass.config))
             {
-                string jsonString = File.ReadAllText(address); //gets the json into a string
-                Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(jsonString);  //string to object GET THE OBJECT CODE OFF A WEBSITE
+                try
+                {
+                    string name = descriptor.Name;
+                    object value = descriptor.GetValue(myDeserializedClass.config);
+                    Console.WriteLine("{0}={1}", name, value);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            Console.WriteLine("\nUsage");
+            foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(myDeserializedClass.usage))
+            {
+                try
+                {
+                    string name = descriptor.Name;
+                    object value = descriptor.GetValue(myDeserializedClass.usage);
+                    Console.WriteLine("{0}={1}", name, value);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            Console.WriteLine("\nData");
 
-                //display below
-                Console.WriteLine("\nConfig");
-                foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(myDeserializedClass.config))
+            foreach (var item in myDeserializedClass.data)
+            {
+                foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(item))
                 {
                     try
                     {
                         string name = descriptor.Name;
-                        object value = descriptor.GetValue(myDeserializedClass.config);
-                        Console.WriteLine("{0}={1}", name, value);
+                        if (name != "timeSeries")
+                        {
+                            object value = descriptor.GetValue(item);
+                            Console.WriteLine("{0}={1}", name, value);
+                        }
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
                     }
-                }
-                Console.WriteLine("\nUsage");
-                foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(myDeserializedClass.usage))
-                {
-                    try
-                    {
-                        string name = descriptor.Name;
-                        object value = descriptor.GetValue(myDeserializedClass.usage);
-                        Console.WriteLine("{0}={1}", name, value);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                }
-                Console.WriteLine("\nData");
 
-                foreach (var item in myDeserializedClass.data)
+
+                }
+            }
+
+            Console.WriteLine("TimeSeries");
+            for (int i = 0; i < myDeserializedClass.data.Count; i++)
+            {
+                foreach (var item in myDeserializedClass.data[0].timeSeries)
                 {
                     foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(item))
                     {
                         try
                         {
                             string name = descriptor.Name;
-                            if (name != "timeSeries")
-                            {
-                                object value = descriptor.GetValue(item);
-                                Console.WriteLine("{0}={1}", name, value);
-                            }
+                            object value = descriptor.GetValue(item);
+                            Console.WriteLine("{0}={1}", name, value);
                         }
                         catch (Exception e)
                         {
@@ -73,49 +88,41 @@ namespace TP1_CSharp
                         }
 
 
+
                     }
                 }
-
-                Console.WriteLine("TimeSeries");
-                for (int i = 0; i < myDeserializedClass.data.Count; i++)
-                {
-                    foreach (var item in myDeserializedClass.data[0].timeSeries)
-                    {
-                        foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(item))
-                        {
-                            try
-                            {
-                                string name = descriptor.Name;
-                                object value = descriptor.GetValue(item);
-                                Console.WriteLine("{0}={1}", name, value);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e);
-                            }
+            }
 
 
 
-                        }
-                    }
-                }
 
+        }
+    
+        static Root LoadJson(string address)
+        {
+            try
+            {
+                string jsonString = File.ReadAllText(address); //gets the json into a string
+                Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(jsonString);  //string to object GET THE OBJECT CODE OFF A WEBSITE
 
+                return myDeserializedClass;
 
 
             }
 
+
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                return null;
             }
 
         }
         static void ex5()
         {
 
-            LoadJson("D:\\School\\CSharp\\TP1 CSharp\\DOGE_AllDataPoints_3Days.json");
-
+            Root myDeserializedClass = LoadJson("D:\\School\\CSharp\\TP1 CSharp\\DOGE_AllDataPoints_3Days.json");
+            displayTP1(myDeserializedClass);
         }
 
         static void ex4()
