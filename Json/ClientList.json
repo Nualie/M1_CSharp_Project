@@ -5,16 +5,16 @@
 				"_firstname": "Bob",
 				"_lastname": "Lennon",
 				"_pin": 1234,
-				"currencyList": [ "euro", "dollar" ],
-				"_mainCurrency": "euro"
+				"currencyList": [ "EUR", "USD" ],
+				"_mainCurrency": "EUR"
 			},
 			{
 				"_guid": "00000000-0000-0000-0000-000000000001",
 				"_firstname": "Jean",
 				"_lastname": "Lennon",
 				"_pin": 5678,
-				"currencyList": [ "euro", "dollar" ],
-				"_mainCurrency": "dollar"
+				"currencyList": [ "EUR", "USD" ],
+				"_mainCurrency": "USD"
 			}
 		]
 	}

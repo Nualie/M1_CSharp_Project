@@ -20,14 +20,27 @@ namespace Bank {
 		}
 		public void print()
 		{
-			Console.WriteLine("Client:\n");
+			Console.WriteLine("Client:");
 			foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(this))
 			{
 				try
 				{
 					string name = descriptor.Name;
-					object value = descriptor.GetValue(this);
-					Console.WriteLine("{0}={1}", name, value);
+					if (name == "currencyList")
+					{
+						Console.WriteLine("Currency list:");
+						foreach(string item in this.currencyList)
+                        {
+							Console.WriteLine($"   - {item}");
+
+						}
+					}
+					else
+					{
+						object value = descriptor.GetValue(this);
+						Console.WriteLine("{0}= {1}", name, value);
+					}
+					
 				}
 				catch (Exception e)
 				{
@@ -37,10 +50,8 @@ namespace Bank {
 		}
 	}
 
-	public class Root
-	{
-		public List<Client> Client { get; set; }
-	}
+	
+
 
 
 	

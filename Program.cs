@@ -2,24 +2,25 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Newtonsoft.Json;
 using System.ComponentModel;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Data;
+using System.Threading.Tasks;
+using System.Net;
+
 namespace Bank
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            Root test = LoadJson("D:\\School\\CSharp\\Project\\M1_CSharp_Project\\ClientList.json");
-            try
-            {
-                test.Client[0].print();
-            }catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            
+            //Root test = LoadJson("D:\\School\\CSharp\\Project\\M1_CSharp_Project\\Json\\ClientList.json");
+
+            Processor process = new Processor();
+            var info = Processor.LoadInformation();
+            Console.WriteLine(info.Result.ToString());
         }
         static Root LoadJson(string address)
         {
