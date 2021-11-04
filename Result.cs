@@ -10,26 +10,24 @@ namespace Bank
     public class Result
     {
 
-		public List<string> ConvertType { get; set; }
-		public List<object> ConvertRate { get; set; }
+        public string ConvertType { get; set; }
+		public float ConvertRate { get; set; }
 
         public Result()
         {
-            this.ConvertRate = new List<object>();
-            this.ConvertType = new List<string>();
+            this.ConvertRate = 1;
+            this.ConvertType = "ALL";
         }
-        
-        override
-        public string ToString()
+
+       
+
+        public override string ToString()
         {
             string res = "";
             string each = "";
-            for(int i = 0; i < this.ConvertType.Count; i++)
-            {
-                each = this.ConvertType[i] + " : " + this.ConvertRate[i].ToString();
-                res = String.Concat(res, each);
-            }
-            
+            each = this.ConvertType + " : " + this.ConvertRate.ToString();
+            res = String.Concat(res, each);
+
             return res;
         }
 

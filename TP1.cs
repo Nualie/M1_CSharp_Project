@@ -173,7 +173,7 @@ namespace TP1_CSharp
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"{i} didn't work.");
+                    Console.WriteLine($"{i} didn't work.\n{e}");
                 }
 
         }

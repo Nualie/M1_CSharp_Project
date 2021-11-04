@@ -16,13 +16,32 @@ namespace Bank
     {
         static void Main()
         {
-            //Root test = LoadJson("D:\\School\\CSharp\\Project\\M1_CSharp_Project\\Json\\ClientList.json");
+        
+            string directory = Directory.GetCurrentDirectory();
+           
+            int index = directory.LastIndexOf("bin\\"); //get back to main resources directory
+            if (index >= 0)
+                directory = directory.Substring(0, index);
+            
+            Root test = LoadClientJson(directory+"\\Json\\ClientList.json");
 
             Processor process = new Processor();
-            var info = Processor.LoadInformation();
-            Console.WriteLine(info.Result.ToString());
+
+            test.Client[0].ViewTotalAmount();
+            /*var info = Processor.LoadInformation();
+            try
+            {
+                Console.WriteLine(info.Result.ToString());
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);            
+            }*/
+
+
         }
-        static Root LoadJson(string address)
+
+        static Root LoadClientJson(string address)
         {
             try
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Bank {
 
@@ -12,13 +13,49 @@ namespace Bank {
 		public string _lastname { get; set; }
 		public int _pin { get; set; }
 		public List<string> currencyList { get; set; }
+		public List<int> currencyAmount { get; set; }
 		public string _mainCurrency { get; set; }
 
 		public override String ToString()
 		{
 			return $"\n{_firstname} {_lastname}\nGuid:{_guid}\nMain currency:{_mainCurrency}";
 		}
-		public void print()
+
+		public async void ViewTotalAmount()
+        {
+			float total = 0;
+			for(int i = 0; i<currencyList.Count;i++)
+            {
+				Result info = await Processor.ReturnConvertInfo(currencyList[i], _mainCurrency);
+				total += info.ConvertRate * currencyAmount[i];
+            }
+			Console.WriteLine("Your total money is "+total+" "+_mainCurrency);
+        }
+
+		public void RetrieveMoney()
+        {
+
+        }
+
+		public void AddMoney()
+        {
+
+        }
+
+		public void ChangePIN()
+        {
+
+        }
+
+		public async Task ExchangeBetweenCurrencies()
+        {
+			string firstcurrency = "USD";
+			string othercurrency = "EUR";
+			Result info = await Processor.ReturnConvertInfo(firstcurrency, othercurrency);
+
+		}
+
+		public void Print() //View GUID and credentials
 		{
 			Console.WriteLine("Client:");
 			foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(this))
@@ -26,14 +63,17 @@ namespace Bank {
 				try
 				{
 					string name = descriptor.Name;
-					if (name == "currencyList")
+					if (name == "currencyList" || name == "currencyAmount")
 					{
-						Console.WriteLine("Currency list:");
-						foreach(string item in this.currencyList)
+						if(name== "currencyList")
                         {
-							Console.WriteLine($"   - {item}");
-
+							Console.WriteLine("Currency list:");
+							for (int i = 0; i < currencyList.Count; i++)
+							{
+								Console.WriteLine($"   - {currencyList[i]}: {currencyAmount[i]}");
+							}
 						}
+						
 					}
 					else
 					{
@@ -57,8 +97,8 @@ namespace Bank {
 	
 	}
 
-	
-	
+
+
 
 
 /*
@@ -69,4 +109,15 @@ namespace Bank {
 • List of currencies and amount in each currency (use list)
 • Main currency
 • Any other important fields for the smooth run of the software
+
+Functionalities:
+
+View GUID and credentials (all except pin!)
+• View total amount in preferred currency
+• Retrieve money from currency
+• Add money to currency
+• Change pin
+• Exchange between currencies
+• Transfer between client (optional)
+• Leave message for admin(optional)
 */

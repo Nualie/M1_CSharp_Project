@@ -1,20 +1,23 @@
 {
-		"Client": [
-			{
-				"_guid": "00000000-0000-0000-0000-000000000000",
-				"_firstname": "Bob",
-				"_lastname": "Lennon",
-				"_pin": 1234,
-				"currencyList": [ "EUR", "USD" ],
-				"_mainCurrency": "EUR"
-			},
-			{
-				"_guid": "00000000-0000-0000-0000-000000000001",
-				"_firstname": "Jean",
-				"_lastname": "Lennon",
-				"_pin": 5678,
-				"currencyList": [ "EUR", "USD" ],
-				"_mainCurrency": "USD"
-			}
-		]
-	}
+	"Client": [
+		{
+			"_guid": "663fbf75-98bf-4d14-a1e7-c7bd9ce0d46b",
+			"_firstname": "Bob",
+			"_lastname": "Lennon",
+			"_pin": 1234,
+			"currencyList": [ "EUR", "USD" ],
+			"currencyAmount": [ 1000,200 ],
+			"_mainCurrency": "EUR"
+		},
+		{
+			"_guid": "bfdbee96-e65a-4c43-894e-2e656a21729b",
+			"_firstname": "Jean",
+			"_lastname": "Lennon",
+			"_pin": 5678,
+			"currencyList": [ "EUR", "USD" ],
+			"currencyAmount": [ 100, 2000 ],
+			"_mainCurrency": "USD"
+		}
+	]
+}
+
