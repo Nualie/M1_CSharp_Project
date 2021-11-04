@@ -26,7 +26,7 @@ namespace Bank
             Root test = LoadClientJson(directory+"\\Json\\ClientList.json");
 
             Processor process = new Processor();
-
+            Console.WriteLine(1);
             test.Client[0].ViewTotalAmount();
             /*var info = Processor.LoadInformation();
             try

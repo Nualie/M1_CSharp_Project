@@ -24,11 +24,17 @@ namespace Bank {
 		public async void ViewTotalAmount()
         {
 			float total = 0;
-			for(int i = 0; i<currencyList.Count;i++)
+			Console.WriteLine(2);
+			Result info = new Result();
+			for (int i = 1; i<currencyList.Count;i++)
             {
-				Result info = await Processor.ReturnConvertInfo(currencyList[i], _mainCurrency);
-				total += info.ConvertRate * currencyAmount[i];
-            }
+				
+				info = await Processor.ReturnConvertInfo(currencyList[i], _mainCurrency);
+				
+				total = info.ConvertRate * currencyAmount[i] + total;
+				
+			}
+			Console.WriteLine("hello");
 			Console.WriteLine("Your total money is "+total+" "+_mainCurrency);
         }
 

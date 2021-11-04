@@ -36,37 +36,33 @@ namespace Bank
         public static async Task<Result> LoadConvertInformation(string convertString)
         {
             string key = "7d7e5775270005b2bf61";
-            string url = $"https://free.currconv.com/api/v7/convert?q={convertString}&compact=ultra&apiKey=" +key;
+            string url = $"https://free.currconv.com/api/v7/convert?q="+convertString+"&compact=ultra&apiKey="+key;
             
             //https://free.currconv.com/api/v7/convert?q=USD_PHP&compact=ultra&apiKey=7d7e5775270005b2bf61
 
             ApiHelper help = new ApiHelper();
             using (HttpResponseMessage response = await help.ApiClient.GetAsync(url))
             {
+                Console.WriteLine("Status code: " + response.StatusCode);
                 Result result = new Result();
-                //Console.WriteLine("Status code: " + response.StatusCode);
                 if (response.IsSuccessStatusCode)
                 {
-                    
-                    var info = await response.Content.ReadAsAsync<JObject>();
-                    
-                    foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(info))
-                    {
-                        try
-                        {
-                            string name = descriptor.Name;
-                            object value = descriptor.GetValue(info);
-                            result.ConvertType=name;
-                            result.ConvertRate=Convert.ToInt32(value);
 
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
+                    Result info = new Result();
+
+                    try
+                    {
+                        info = await response.Content.ReadAsAsync<Result>();
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
                     }
 
-                    
+                    result.ConvertType = info.ConvertType; 
+                    result.ConvertRate = info.ConvertRate; 
+
                 }
                 else
                 {
@@ -89,6 +85,7 @@ namespace Bank
             }
             string convertString = convertCurrency(from, to);
             Result info = await Processor.LoadConvertInformation(convertString);
+            
             return info;
         
         }
