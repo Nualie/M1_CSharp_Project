@@ -8,17 +8,17 @@ namespace Bank {
 	// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
 	public class Client
 	{
-		public string _guid { get; set; }
-		public string _firstname { get; set; }
-		public string _lastname { get; set; }
-		public int _pin { get; set; }
+		public string guid { get; set; }
+		public string firstname { get; set; }
+		public string lastname { get; set; }
+		public int pin { get; set; }
 		public List<string> currencyList { get; set; }
 		public List<int> currencyAmount { get; set; }
-		public string _mainCurrency { get; set; }
+		public string mainCurrency { get; set; }
 
 		public override String ToString()
 		{
-			return $"\n{_firstname} {_lastname}\nGuid:{_guid}\nMain currency:{_mainCurrency}";
+			return $"\n{firstname} {lastname}\nGuid:{guid}\nMain currency:{mainCurrency}";
 		}
 
 		public async void ViewTotalAmount()
@@ -29,13 +29,13 @@ namespace Bank {
 			for (int i = 1; i<currencyList.Count;i++)
             {
 				
-				info = await Processor.ReturnConvertInfo(currencyList[i], _mainCurrency);
+				info = await Processor.ReturnConvertInfo(currencyList[i], mainCurrency);
 				
 				total = info.ConvertRate * currencyAmount[i] + total;
 				
 			}
 			Console.WriteLine("hello");
-			Console.WriteLine("Your total money is "+total+" "+_mainCurrency);
+			Console.WriteLine("Your total money is "+total+" "+mainCurrency);
         }
 
 		public void RetrieveMoney()

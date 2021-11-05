@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using System.Data;
 using System.Threading.Tasks;
 using System.Net;
+using System.Data.SQLite;
 
 namespace Bank
 {
@@ -16,37 +17,36 @@ namespace Bank
     {
         static void Main()
         {
-        
-            string directory = Directory.GetCurrentDirectory();
-           
-            int index = directory.LastIndexOf("bin\\"); //get back to main resources directory
-            if (index >= 0)
-                directory = directory.Substring(0, index);
-            
+
+            string directory = returnDirectory();
+
+
             Root test = LoadClientJson(directory+"\\Json\\ClientList.json");
 
             Processor process = new Processor();
-            Console.WriteLine(1);
-            test.Client[0].ViewTotalAmount();
-            /*var info = Processor.LoadInformation();
-            try
-            {
-                Console.WriteLine(info.Result.ToString());
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e);            
-            }*/
 
+            SQLiteManager.CheckVersion();
+            SQLiteManager.test();
 
         }
 
-        static Root LoadClientJson(string address)
+        public static string returnDirectory()
+        {
+            string directory = Directory.GetCurrentDirectory();
+
+            int index = directory.LastIndexOf("bin\\"); //get back to main resources directory
+            if (index >= 0)
+                directory = directory.Substring(0, index);
+
+            return directory;
+        }
+ 
+        public static Root LoadClientJson(string address)
         {
             try
             {
                 string jsonString = File.ReadAllText(address); //gets the json into a string
-                Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(jsonString);  //string to object GET THE OBJECT CODE OFF A WEBSITE
+                Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(jsonString);  //string to object 
                 return myDeserializedClass;
 
             }

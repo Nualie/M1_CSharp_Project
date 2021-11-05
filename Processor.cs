@@ -49,10 +49,12 @@ namespace Bank
                 {
 
                     Result info = new Result();
-
+                    info = await response.Content.ReadAsAsync<Result>();
                     try
                     {
-                        info = await response.Content.ReadAsAsync<Result>();
+
+                        result.ConvertType = info.ConvertType;
+                        result.ConvertRate = info.ConvertRate;
 
                     }
                     catch (Exception e)
@@ -60,8 +62,6 @@ namespace Bank
                         Console.WriteLine(e);
                     }
 
-                    result.ConvertType = info.ConvertType; 
-                    result.ConvertRate = info.ConvertRate; 
 
                 }
                 else
