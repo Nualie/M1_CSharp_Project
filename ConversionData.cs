@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Bank
 {
-    public class Result
+    public class ConversionData
     {
 
         public string ConvertType { get; set; }
 		public float ConvertRate { get; set; }
 
-        public Result()
+        public ConversionData()
         {
             this.ConvertRate = 1;
             this.ConvertType = "ALL";

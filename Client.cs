@@ -25,7 +25,7 @@ namespace Bank {
         {
 			float total = 0;
 			Console.WriteLine(2);
-			Result info = new Result();
+			ConversionData info = new ConversionData();
 			for (int i = 1; i<currencyList.Count;i++)
             {
 				
@@ -40,24 +40,25 @@ namespace Bank {
 
 		public void RetrieveMoney()
         {
+			throw new NotImplementedException();
+		}
 
-        }
 
-		public void AddMoney()
+        public void AddMoney()
         {
-
-        }
+			throw new NotImplementedException();
+		}
 
 		public void ChangePIN()
         {
-
-        }
+			throw new NotImplementedException();
+		}
 
 		public async Task ExchangeBetweenCurrencies()
         {
 			string firstcurrency = "USD";
 			string othercurrency = "EUR";
-			Result info = await Processor.ReturnConvertInfo(firstcurrency, othercurrency);
+			ConversionData info = await Processor.ReturnConvertInfo(firstcurrency, othercurrency);
 
 		}
 

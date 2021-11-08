@@ -33,7 +33,7 @@ namespace Bank
 
 
 
-        public static async Task<Result> LoadConvertInformation(string convertString)
+        public static async Task<ConversionData> LoadConvertInformation(string convertString)
         {
             string key = "7d7e5775270005b2bf61";
             string url = $"https://free.currconv.com/api/v7/convert?q="+convertString+"&compact=ultra&apiKey="+key;
@@ -44,12 +44,12 @@ namespace Bank
             using (HttpResponseMessage response = await help.ApiClient.GetAsync(url))
             {
                 Console.WriteLine("Status code: " + response.StatusCode);
-                Result result = new Result();
+                ConversionData result = new ConversionData();
                 if (response.IsSuccessStatusCode)
                 {
 
-                    Result info = new Result();
-                    info = await response.Content.ReadAsAsync<Result>();
+                    ConversionData info = new ConversionData();
+                    info = await response.Content.ReadAsAsync<ConversionData>();
                     try
                     {
 
@@ -77,14 +77,14 @@ namespace Bank
 
         }
 
-        public static async Task<Result> ReturnConvertInfo(string from, string to)
+        public static async Task<ConversionData> ReturnConvertInfo(string from, string to)
         {
             if(from == to)
             {
-                return new Result();
+                return new ConversionData();
             }
             string convertString = convertCurrency(from, to);
-            Result info = await Processor.LoadConvertInformation(convertString);
+            ConversionData info = await Processor.LoadConvertInformation(convertString);
             
             return info;
         
