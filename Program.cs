@@ -34,6 +34,7 @@ namespace Bank
 
             Admin admin = new Admin();
             admin.ResetDatabase();
+            admin.CreateClient();
 
 
         }

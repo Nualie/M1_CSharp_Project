@@ -67,6 +67,11 @@ namespace Bank
             }
         }
 
+        public void CreateClient()
+        {
+            sql.CreateUser();
+        }
+
         public void ResetDatabase()
         {
             sql.ResetDatabaseFromJSON();
@@ -105,6 +110,24 @@ namespace Bank
                 return false;
             }
 
+        }
+
+        public static string AskForCurrencySymbol()
+        {
+            Processor process = new Processor();
+            foreach (CurrencyListClass.Currency item in process.AllCurrencies.AllCurrencies.Currencies)
+            {
+                Console.WriteLine(item);
+            }
+
+            Console.WriteLine("Please enter the new client's main currency. Must be a valid ID.");
+            string read = Console.ReadLine();
+            while (!process.AllCurrencyIds.Contains(read))
+            {
+                Console.WriteLine("Invalid ID.\nPlease enter the new client's main currency. Must be a valid ID.");
+                read = Console.ReadLine();
+            }
+            return read;
         }
 
         public static Root LoadClientJson(string address)

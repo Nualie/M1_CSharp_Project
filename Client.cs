@@ -38,27 +38,69 @@ namespace Bank {
 			Console.WriteLine("Your total money is "+total+" "+mainCurrency);
         }
 
-		public void RetrieveMoney()
+		public Client RetrieveMoney(Client c)
         {
-			throw new NotImplementedException();
+			c.Print();
+			Console.WriteLine("Pick an account to withdraw from.");
+			string read = Console.ReadLine();
+            while (!c.currencyList.Contains(read))
+            {
+				Console.WriteLine("Not a valid account. Pick an existing account to withdraw from.");
+				read = Console.ReadLine();
+			}
+			string account = read;
+
+			Console.WriteLine("Retrieve how much money? Type in a positive integer.");
+			int newmoney = 0;
+			while (!Int32.TryParse(read,out newmoney) && newmoney > 0)
+			{
+				Console.WriteLine("Not a valid positive integer. Try again.");
+				read = Console.ReadLine();
+			}
+
+			c.currencyAmount[c.currencyList.IndexOf(account)] -= newmoney;
+
+			c.Print();
+
+			return c;
+
 		}
 
 
-        public void AddMoney()
+        public Client AddMoney(Client c)
         {
-			throw new NotImplementedException();
+			c.Print();
+			Console.WriteLine("Pick an account to add to.");
+			string read = Console.ReadLine();
+			while (!c.currencyList.Contains(read))
+			{
+				Console.WriteLine("Not a valid account. Pick an existing account to add to.");
+				read = Console.ReadLine();
+			}
+			string account = read;
+
+			Console.WriteLine("Add how much money? Type in a positive integer.");
+			int newmoney = 0;
+			while (!Int32.TryParse(read, out newmoney) && newmoney>0)
+			{
+				Console.WriteLine("Not a valid positive integer. Try again.");
+				read = Console.ReadLine();
+			}
+
+			c.currencyAmount[c.currencyList.IndexOf(account)] += newmoney;
+
+			c.Print();
+
+			return c;
 		}
 
-		public void ChangePIN()
+		
+		public async Task<ConversionData> ExchangeBetweenCurrencies()
         {
-			throw new NotImplementedException();
-		}
-
-		public async Task ExchangeBetweenCurrencies()
-        {
-			string firstcurrency = "USD";
-			string othercurrency = "EUR";
+			string firstcurrency = Admin.AskForCurrencySymbol();
+			string othercurrency = Admin.AskForCurrencySymbol();
 			ConversionData info = await Processor.ReturnConvertInfo(firstcurrency, othercurrency);
+			return info;
 
 		}
 

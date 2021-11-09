@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Bank.CurrencyListClass;
 
 namespace Bank
 {
@@ -200,14 +201,48 @@ namespace Bank
             GetAccountData();
         }
 
+        
+
         public void CreateUser()
         {
-            Guid guid = new Guid();
+            Guid guid = Guid.NewGuid();
             string firstname = "";
             string lastname = "";
-            //etc
-            //TODO
-            throw new NotImplementedException();
+            int pin = 0;
+            string mainCurrency = "";
+            string[] currencyList = {};
+			int[] currencyAmount = {0};
+
+            string read = Admin.AskForCurrencySymbol();
+            mainCurrency = read;
+            currencyList.Append(read);
+            read = "";
+
+            Console.WriteLine("Please enter the new client's first name.");
+            read = Console.ReadLine();
+            firstname = read;
+            read = "";
+            Console.WriteLine("Please enter the new client's last name.");
+            read = Console.ReadLine();
+            lastname = read;
+
+            string directory = Admin.ReturnDirectory();
+            string cs = $@"URI=file:{directory}\\Database\\Client.db";
+
+            using var con = new SQLiteConnection(cs);
+            con.Open();
+
+            string stm = "SELECT * FROM clients ORDER BY guid";
+
+            using var cmd = new SQLiteCommand(stm, con);
+
+            cmd.CommandText = $"INSERT INTO clients(guid, firstname, lastname, pin, mainCurrency, blocked) VALUES('{guid}','{firstname}','{lastname}',{pin},'{mainCurrency}',false)";
+            cmd.ExecuteNonQuery();
+
+            cmd.CommandText = $"INSERT INTO accounts(guid, currency, amount) VALUES('{guid}','{mainCurrency}',0)";
+            cmd.ExecuteNonQuery();
+
+            GetAll();
         }
 
         public void GetClient(Guid guid)

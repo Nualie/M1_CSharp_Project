@@ -45,11 +45,18 @@ namespace Bank
             }
 
         }
+
+        
         public class Currency
         {
             public string currencyName { get; set; }
             public string currencySymbol { get; set; }
             public string id { get; set; }
+
+            public override string ToString()
+            {
+                return currencyName + " " + (currencySymbol ??= "") + ": " + id; ;
+            }
         }
 
         public class CurrencyList
