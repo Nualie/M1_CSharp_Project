@@ -11,6 +11,43 @@ namespace Bank
     class ClientDBAccess : IClientDataAccess
     {
 
+        public Root GetRootFromDatabase() //use from Admin, to reset json from database
+        {
+            string directory = Admin.ReturnDirectory();
+            string cs = $@"URI=file:{directory}\\Database\\Client.db";
+
+            using var con = new SQLiteConnection(cs);
+            con.Open();
+            string stm = $"SELECT * FROM clients ORDER BY guid";
+            using var cmd = new SQLiteCommand(stm, con);
+
+            using SQLiteDataReader rdr = cmd.ExecuteReader();
+
+            Root newData = new Root();
+
+            while (rdr.Read())
+            {
+                newData.Client.Add(new Client(rdr.GetGuid(0), rdr.GetString(1), rdr.GetString(2),rdr.GetString(4),rdr.GetInt32(3)));
+            }
+
+
+            foreach(Client c in newData.Client)
+            {
+                cmd.CommandText = $"SELECT * FROM accounts ORDER BY currency WHERE guid='{c.guid}'";
+                cmd.ExecuteNonQuery();
+
+                while (rdr.Read())
+                {
+                    c.currencyList.Add(rdr.GetString(1));
+                    c.currencyAmount.Add(rdr.GetInt32(2));
+                }
+            }
+
+            return newData;
+
+        }
+
+
         public void ResetDatabaseFromJSON()
         {
             string directory = Admin.ReturnDirectory();
@@ -25,7 +62,7 @@ namespace Bank
             cmd.ExecuteNonQuery();
 
             cmd.CommandText = @"CREATE TABLE clients(guid GUID PRIMARY KEY,
-            firstname TEXT, lastname TEXT, pin INT, mainCurrency TEXT, blocked BOOL)";
+            firstName TEXT, lastName TEXT, pin INT, mainCurrency TEXT, tries INT, blocked BOOL)";
             cmd.ExecuteNonQuery();
 
             //Console.WriteLine("clients table created");
@@ -33,12 +70,12 @@ namespace Bank
             Root info = Admin.LoadClientJson(directory + "\\Json\\ClientList.json");
             for(int i = 0; i < info.Client.Count; i++)
             {
-                cmd.CommandText = $"INSERT INTO clients(guid, firstname, lastname, pin, mainCurrency, blocked) VALUES('{info.Client[i].guid}','{info.Client[i].firstname}','{info.Client[i].lastname}',{info.Client[i].pin},'{info.Client[i].mainCurrency}',false)";
+                cmd.CommandText = $"INSERT INTO clients(guid, firstName, lastName, pin, mainCurrency, tries, blocked) VALUES('{info.Client[i].guid}','{info.Client[i].firstName}','{info.Client[i].lastName}',{info.Client[i].pin},'{info.Client[i].mainCurrency}',{info.Client[i].tries},{info.Client[i].blocked})";
                 cmd.ExecuteNonQuery();
             }
 
             cmd.CommandText = @"CREATE TABLE accounts(guid GUID,
-            currency TEXT, amount FLOAT, PRIMARY KEY(guid, currency))";
+            currency TEXT, amount INT, PRIMARY KEY(guid, currency))";
             cmd.ExecuteNonQuery();
 
             //Console.WriteLine("accounts table created");
@@ -58,10 +95,10 @@ namespace Bank
         {
             GetClient(guid);
 
-            int pin = AskUserForPIN();
+            int pin = Admin.AskUserForPIN();
             string directory = Admin.ReturnDirectory();
             string cs = $@"URI=file:{directory}\\Database\\Client.db";
-            Console.WriteLine("\n");
+            
             using var con = new SQLiteConnection(cs);
             con.Open();
 
@@ -77,20 +114,73 @@ namespace Bank
 
         }
 
-        public int AskUserForPIN()
+        internal void BlockClient(Guid guid)
         {
-            Console.WriteLine("What to change PIN to?");
-            string read = Console.ReadLine();
-            int pin = 0;
-            while(!(Int32.TryParse(read, out pin) && pin >= 0 && pin<10000))
-            {
-                Console.WriteLine($"{read} is an invalid PIN. What to change PIN to?");
-                read = Console.ReadLine();
-            }
-            return pin;
+            GetClient(guid);
+
+            int pin = Admin.AskUserForPIN();
+            string directory = Admin.ReturnDirectory();
+            string cs = $@"URI=file:{directory}\\Database\\Client.db";
+
+            using var con = new SQLiteConnection(cs);
+            con.Open();
+
+            string stm = $"SELECT * FROM clients WHERE guid='{guid}'";
+            using var cmd = new SQLiteCommand(stm, con);
+
+            cmd.CommandText = $"UPDATE clients SET blocked=true WHERE guid='{guid}'";
+            cmd.ExecuteNonQuery();
+
+            GetClient(guid);
+
+            Console.WriteLine("Client blocked successfully.");
         }
 
-        public Guid getClientGuid(int n)
+        internal void UnblockClient(Guid guid)
+        {
+            GetClient(guid);
+
+            int pin = Admin.AskUserForPIN();
+            string directory = Admin.ReturnDirectory();
+            string cs = $@"URI=file:{directory}\\Database\\Client.db";
+
+            using var con = new SQLiteConnection(cs);
+            con.Open();
+
+            string stm = $"SELECT * FROM clients WHERE guid='{guid}'";
+            using var cmd = new SQLiteCommand(stm, con);
+
+            cmd.CommandText = $"UPDATE clients SET blocked=false WHERE guid='{guid}'";
+            cmd.ExecuteNonQuery();
+
+            GetClient(guid);
+
+            Console.WriteLine("Client unblocked successfully.");
+            ResetTries(guid);
+        }
+
+        internal void ResetTries(Guid guid)
+        {
+            GetClient(guid);
+
+            string directory = Admin.ReturnDirectory();
+            string cs = $@"URI=file:{directory}\\Database\\Client.db";
+
+            using var con = new SQLiteConnection(cs);
+            con.Open();
+
+            string stm = $"SELECT * FROM clients WHERE guid='{guid}'";
+            using var cmd = new SQLiteCommand(stm, con);
+
+            cmd.CommandText = $"UPDATE clients SET tries=3 WHERE guid='{guid}'";
+            cmd.ExecuteNonQuery();
+
+            GetClient(guid);
+
+            Console.WriteLine("Tries reset successfully.");
+        }
+
+        public Guid GetClientGuid(int n)
         {
             string directory = Admin.ReturnDirectory();
             string cs = $@"URI=file:{directory}\\Database\\Client.db";
@@ -115,7 +205,7 @@ namespace Bank
             return guid;
         }
 
-        public int getClientNumber()
+        public int GetClientNumber()
         {
             string directory = Admin.ReturnDirectory();
             string cs = $@"URI=file:{directory}\\Database\\Client.db";
@@ -150,7 +240,7 @@ namespace Bank
             int num = 0;
             while (rdr.Read())
             {
-                Console.WriteLine($"{num}.\n{rdr.GetGuid(0)} {rdr.GetString(1)} {rdr.GetFloat(2)}");
+                Console.WriteLine($"{num}.\n{rdr.GetGuid(0)} {rdr.GetString(1)} {rdr.GetInt32(2)}");
                 num++;
             }
             rdr.Close();
@@ -180,19 +270,28 @@ namespace Bank
             con.Close();
         }
 
-        public void CheckVersion()
+        public bool CheckVersion()
         {
             string cs = "Data Source=:memory:";
             string stm = "SELECT SQLITE_VERSION()";
 
-            using var con = new SQLiteConnection(cs);
-            con.Open();
+            try
+            {
+                using var con = new SQLiteConnection(cs);
+                con.Open();
 
-            using var cmd = new SQLiteCommand(stm, con);
-            string version = cmd.ExecuteScalar().ToString();
+                using var cmd = new SQLiteCommand(stm, con);
+                string version = cmd.ExecuteScalar().ToString();
 
-            Console.WriteLine($"SQLite version: {version}");
-            con.Close();
+                Console.WriteLine($"SQLite version: {version}");
+                con.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+            return true;
         }
 
         public void GetAll()
@@ -201,7 +300,38 @@ namespace Bank
             GetAccountData();
         }
 
-        
+        public void CreateUser(Client c) //from Client
+        {
+            Guid guid = Guid.Parse(c.guid);
+            string firstname = c.firstName;
+            string lastname = c.lastName;
+            int pin = c.pin;
+            string mainCurrency = c.mainCurrency;
+            List<string> currencyList = c.currencyList;
+            List<int> currencyAmount = c.currencyAmount;
+
+            string directory = Admin.ReturnDirectory();
+            string cs = $@"URI=file:{directory}\\Database\\Client.db";
+
+            using var con = new SQLiteConnection(cs);
+            con.Open();
+
+            string stm = "SELECT * FROM clients ORDER BY guid";
+
+            using var cmd = new SQLiteCommand(stm, con);
+
+            cmd.CommandText = $"INSERT INTO clients(guid, firstName, lastName, pin, mainCurrency, tries, blocked) VALUES('{guid}','{firstname}','{lastname}',{pin},'{mainCurrency}',3,false)";
+            cmd.ExecuteNonQuery();
+
+            for(int i = 0; i<c.currencyList.Count(); i++)
+            {
+                cmd.CommandText = $"INSERT INTO accounts(guid, currency, amount) VALUES('{guid}','{currencyList[i]}',{currencyAmount[i]})";
+                cmd.ExecuteNonQuery();
+            }
+            
+
+            GetAll();
+        }
 
         public void CreateUser()
         {
@@ -236,7 +366,7 @@ namespace Bank
 
             using var cmd = new SQLiteCommand(stm, con);
 
-            cmd.CommandText = $"INSERT INTO clients(guid, firstname, lastname, pin, mainCurrency, blocked) VALUES('{guid}','{firstname}','{lastname}',{pin},'{mainCurrency}',false)";
+            cmd.CommandText = $"INSERT INTO clients(guid, firstName, lastName, pin, mainCurrency, tries, blocked) VALUES('{guid}','{firstname}','{lastname}',{pin},'{mainCurrency}',3,false)";
             cmd.ExecuteNonQuery();
 
             cmd.CommandText = $"INSERT INTO accounts(guid, currency, amount) VALUES('{guid}','{mainCurrency}',0)";
@@ -259,14 +389,24 @@ namespace Bank
             using (SQLiteDataReader rdr = cmd.ExecuteReader())
             {
                 rdr.Read();
-                Console.WriteLine($"Client selected:\n{rdr.GetGuid(0)} {rdr.GetString(1)} {rdr.GetString(2)}\nPin: {rdr.GetInt32(3)}\nMain currency: {rdr.GetString(4)}\nBlocked:{rdr.GetBoolean(5)}");
+                Console.WriteLine($"Client selected:\n{rdr.GetGuid(0)} {rdr.GetString(1)} {rdr.GetString(2)}\nPin: {rdr.GetInt32(3)}\nMain currency: {rdr.GetString(4)}\nTries:{rdr.GetInt32(5)}\nBlocked:{rdr.GetBoolean(6)}");
                 
             }
         }
 
-        public void UpdateClient(Client c)
+        public void UpdateClient(Client c) //updated client goes in
         {
-            //MAYBE SCRAP FOR ADMIN? OR USE TO UPDATE FROM JSON
+            if (Guid.TryParse(c.guid, out Guid guid))
+            {
+                DeleteClient(guid);
+                CreateUser(c);
+            }
+            else
+            {
+                Console.WriteLine("Something went wrong. Invalid guid.");
+            }
+            
+
         }
 
         public void DeleteClient(Guid guid)

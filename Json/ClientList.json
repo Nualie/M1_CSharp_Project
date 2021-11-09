@@ -5,6 +5,8 @@
 			"firstname": "Bob",
 			"lastname": "Lennon",
 			"pin": 1234,
+			"blocked": false,
+			"tries": 3,
 			"currencyList": [ "EUR", "USD" ],
 			"currencyAmount": [ 1000,200 ],
 			"mainCurrency": "EUR"
@@ -14,6 +16,8 @@
 			"firstname": "Jean",
 			"lastname": "Lennon",
 			"pin": 5678,
+			"blocked": false,
+			"tries": 3,
 			"currencyList": [ "EUR", "USD" ],
 			"currencyAmount": [ 100, 2000 ],
 			"mainCurrency": "USD"

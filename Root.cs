@@ -11,5 +11,10 @@ namespace Bank
 	{
 		public List<Client> Client { get; set; }
 
+        public Root()
+        {
+			this.Client = new List<Client>();
+        }
+
 	}
 }

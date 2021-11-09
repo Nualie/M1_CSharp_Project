@@ -9,16 +9,42 @@ namespace Bank {
 	public class Client
 	{
 		public string guid { get; set; }
-		public string firstname { get; set; }
-		public string lastname { get; set; }
+		public string firstName { get; set; }
+		public string lastName { get; set; }
 		public int pin { get; set; }
+		public int tries { get; set; } = 3;
+		public bool blocked { get; set; } = false;
 		public List<string> currencyList { get; set; }
 		public List<int> currencyAmount { get; set; }
 		public string mainCurrency { get; set; }
 
+        public Client() { }
+
+        public Client(string firstname,string lastname,string mainCurrency) 
+		{
+			this.guid = Guid.NewGuid().ToString();
+			this.firstName = firstname;
+			this.lastName = lastname;
+			this.pin = 0;
+			this.mainCurrency = mainCurrency;
+			this.currencyList.Add(mainCurrency);
+			this.currencyAmount.Add(0);
+		}
+
+		public Client(Guid guid, string firstname, string lastname, string mainCurrency, int pin)
+		{
+			this.guid = guid.ToString();
+			this.firstName = firstname;
+			this.lastName = lastname;
+			this.mainCurrency = mainCurrency;
+			this.pin = pin;
+			this.currencyList.Add(mainCurrency);
+			this.currencyAmount.Add(0);
+		}
+
 		public override String ToString()
 		{
-			return $"\n{firstname} {lastname}\nGuid:{guid}\nMain currency:{mainCurrency}";
+			return $"\n{firstName} {lastName}\nGuid:{guid}\nMain currency:{mainCurrency}";
 		}
 
 		public async void ViewTotalAmount()
@@ -34,13 +60,12 @@ namespace Bank {
 				total = info.ConvertRate * currencyAmount[i] + total;
 				
 			}
-			Console.WriteLine("hello");
-			Console.WriteLine("Your total money is "+total+" "+mainCurrency);
+			Console.WriteLine("The total money is "+total+" "+mainCurrency);
         }
 
-		public Client RetrieveMoney(Client c)
+		public static Client RetrieveMoney(Client c)
         {
-			c.Print();
+			Client.Print(c);
 			Console.WriteLine("Pick an account to withdraw from.");
 			string read = Console.ReadLine();
             while (!c.currencyList.Contains(read))
@@ -60,16 +85,16 @@ namespace Bank {
 
 			c.currencyAmount[c.currencyList.IndexOf(account)] -= newmoney;
 
-			c.Print();
+			Client.Print(c);
 
 			return c;
 
 		}
 
 
-        public Client AddMoney(Client c)
+        public static Client AddMoney(Client c)
         {
-			c.Print();
+			Client.Print(c);
 			Console.WriteLine("Pick an account to add to.");
 			string read = Console.ReadLine();
 			while (!c.currencyList.Contains(read))
@@ -89,8 +114,17 @@ namespace Bank {
 
 			c.currencyAmount[c.currencyList.IndexOf(account)] += newmoney;
 
-			c.Print();
+			Client.Print(c);
 
+			return c;
+		}
+
+		public static Client ChangePin(Client c)
+        {
+			int pin = Admin.AskUserForPIN();
+			Console.WriteLine("\n");
+			c.pin = pin;
+			Console.WriteLine("Pin changed successfully.");
 			return c;
 		}
 
@@ -104,10 +138,60 @@ namespace Bank {
 
 		}
 
-		public void Print() //View GUID and credentials
+		public static void PrintClientData(Client c) //View GUID and credentials
 		{
 			Console.WriteLine("Client:");
-			foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(this))
+			foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(c))
+			{
+				try
+				{
+					string name = descriptor.Name;
+					if (name != "currencyList" && name != "currencyAmount")
+					{
+						object value = descriptor.GetValue(c);
+						Console.WriteLine("{0}= {1}", name, value);
+					}
+
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
+			}
+		}
+
+		public static void PrintAccountData(Client c) //View GUID and credentials
+		{
+			Console.WriteLine("Client:");
+			foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(c))
+			{
+				try
+				{
+					string name = descriptor.Name;
+					if (name == "currencyList")
+					{
+						Console.WriteLine("Currency list:");
+						for (int i = 0; i < c.currencyList.Count; i++)
+						{
+							Console.WriteLine($"   - {c.currencyList[i]}: {c.currencyAmount[i]}");
+						}
+					}else if(name == "guid"){
+						object value = descriptor.GetValue(c);
+						Console.WriteLine("{0}= {1}", name, value);
+					}
+
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
+			}
+		}
+
+		public static void Print(Client c) //View GUID and credentials
+		{
+			Console.WriteLine("Client:");
+			foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(c))
 			{
 				try
 				{
@@ -117,16 +201,16 @@ namespace Bank {
 						if(name== "currencyList")
                         {
 							Console.WriteLine("Currency list:");
-							for (int i = 0; i < currencyList.Count; i++)
+							for (int i = 0; i < c.currencyList.Count; i++)
 							{
-								Console.WriteLine($"   - {currencyList[i]}: {currencyAmount[i]}");
+								Console.WriteLine($"   - {c.currencyList[i]}: {c.currencyAmount[i]}");
 							}
 						}
 						
 					}
 					else
 					{
-						object value = descriptor.GetValue(this);
+						object value = descriptor.GetValue(c);
 						Console.WriteLine("{0}= {1}", name, value);
 					}
 					
