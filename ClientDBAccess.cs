@@ -11,6 +11,48 @@ namespace Bank
     class ClientDBAccess : IClientDataAccess
     {
 
+        public Root LoadClientsForJSON(Root newData)
+        {
+            string directory = Admin.ReturnDirectory();
+            string cs = $@"URI=file:{directory}\\Database\\Client.db";
+
+            using var con = new SQLiteConnection(cs);
+            con.Open();
+            string stm = $"SELECT * FROM clients ORDER BY guid";
+            using var cmd = new SQLiteCommand(stm, con);
+
+            using SQLiteDataReader rdr = cmd.ExecuteReader();
+
+            while (rdr.Read())
+            {
+                newData.Client.Add(new Client(rdr.GetGuid(0), rdr.GetString(1), rdr.GetString(2), rdr.GetString(4), rdr.GetInt32(3)));
+            }
+            rdr.Close();
+            return newData;
+        }
+
+        public Client LoadAccountsForJSON(Client c)
+        {
+            string directory = Admin.ReturnDirectory();
+            string cs = $@"URI=file:{directory}\\Database\\Client.db";
+
+            using var con = new SQLiteConnection(cs);
+            con.Open();
+
+            string stm = $"SELECT * FROM accounts WHERE guid='{c.guid}'";
+            using var cmd = new SQLiteCommand(stm, con);
+
+            using SQLiteDataReader rdr = cmd.ExecuteReader();
+
+            while (rdr.Read())
+            {
+                c.currencyList.Add(rdr.GetString(1));
+                c.currencyAmount.Add(rdr.GetInt32(2));
+            }
+            rdr.Close();
+            return c;
+        }
+
         public Root GetRootFromDatabase() //use from Admin, to reset json from database
         {
             string directory = Admin.ReturnDirectory();
@@ -25,26 +67,37 @@ namespace Bank
 
             Root newData = new Root();
 
-            while (rdr.Read())
+            newData = LoadClientsForJSON(newData);
+
+            for(int i = 0; i< newData.Client.Count();i++)
             {
-                newData.Client.Add(new Client(rdr.GetGuid(0), rdr.GetString(1), rdr.GetString(2),rdr.GetString(4),rdr.GetInt32(3)));
-            }
-
-
-            foreach(Client c in newData.Client)
-            {
-                cmd.CommandText = $"SELECT * FROM accounts ORDER BY currency WHERE guid='{c.guid}'";
-                cmd.ExecuteNonQuery();
-
-                while (rdr.Read())
-                {
-                    c.currencyList.Add(rdr.GetString(1));
-                    c.currencyAmount.Add(rdr.GetInt32(2));
-                }
+                 newData.Client[i]= LoadAccountsForJSON(newData.Client[i]);
             }
 
             return newData;
 
+        }
+
+        public int UpdateClientNumber()
+        {
+            string directory = Admin.ReturnDirectory();
+            string cs = $@"URI=file:{directory}\\Database\\Client.db";
+
+            using var con = new SQLiteConnection(cs);
+            con.Open();
+            string stm = $"SELECT * FROM clients ORDER BY guid";
+            using var cmd = new SQLiteCommand(stm, con);
+
+            using SQLiteDataReader rdr = cmd.ExecuteReader();
+
+            int total = 0;
+
+            while (rdr.Read())
+            {
+                total++;    
+            }
+
+            return total;
         }
 
 
@@ -65,12 +118,13 @@ namespace Bank
             firstName TEXT, lastName TEXT, pin INT, mainCurrency TEXT, tries INT, blocked BOOL)";
             cmd.ExecuteNonQuery();
 
-            //Console.WriteLine("clients table created");
+            
 
             Root info = Admin.LoadClientJson(directory + "\\Json\\ClientList.json");
             for(int i = 0; i < info.Client.Count; i++)
             {
                 cmd.CommandText = $"INSERT INTO clients(guid, firstName, lastName, pin, mainCurrency, tries, blocked) VALUES('{info.Client[i].guid}','{info.Client[i].firstName}','{info.Client[i].lastName}',{info.Client[i].pin},'{info.Client[i].mainCurrency}',{info.Client[i].tries},{info.Client[i].blocked})";
+                Console.WriteLine("blocked check:"+info.Client[i].blocked);
                 cmd.ExecuteNonQuery();
             }
 
@@ -96,6 +150,7 @@ namespace Bank
             GetClient(guid);
 
             int pin = Admin.AskUserForPIN();
+
             string directory = Admin.ReturnDirectory();
             string cs = $@"URI=file:{directory}\\Database\\Client.db";
             
@@ -118,7 +173,6 @@ namespace Bank
         {
             GetClient(guid);
 
-            int pin = Admin.AskUserForPIN();
             string directory = Admin.ReturnDirectory();
             string cs = $@"URI=file:{directory}\\Database\\Client.db";
 
@@ -263,7 +317,7 @@ namespace Bank
             int num = 0;
             while (rdr.Read())
             {
-                Console.WriteLine($"{num}.\n{rdr.GetGuid(0)} {rdr.GetString(1)} {rdr.GetString(2)}\nPin: {rdr.GetInt32(3)}\nMain currency: {rdr.GetString(4)}\nBlocked:{rdr.GetBoolean(5)}");
+                Console.WriteLine($"{num}.\n{rdr.GetGuid(0)} {rdr.GetString(1)} {rdr.GetString(2)}\nPin: {rdr.GetInt32(3)}\nMain currency: {rdr.GetString(4)}\nTries:{rdr.GetInt32(5)}\nBlocked:{rdr.GetBoolean(6)}");
                 num++;
             }
             rdr.Close();
@@ -389,7 +443,7 @@ namespace Bank
             using (SQLiteDataReader rdr = cmd.ExecuteReader())
             {
                 rdr.Read();
-                Console.WriteLine($"Client selected:\n{rdr.GetGuid(0)} {rdr.GetString(1)} {rdr.GetString(2)}\nPin: {rdr.GetInt32(3)}\nMain currency: {rdr.GetString(4)}\nTries:{rdr.GetInt32(5)}\nBlocked:{rdr.GetBoolean(6)}");
+                Console.WriteLine($"\nClient selected:\n{rdr.GetGuid(0)} {rdr.GetString(1)} {rdr.GetString(2)}\nPin: {rdr.GetInt32(3)}\nMain currency: {rdr.GetString(4)}\nTries: {rdr.GetInt32(5)}\nBlocked: {rdr.GetBoolean(6)}");
                 
             }
         }

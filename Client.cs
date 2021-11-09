@@ -18,28 +18,34 @@ namespace Bank {
 		public List<int> currencyAmount { get; set; }
 		public string mainCurrency { get; set; }
 
-        public Client() { }
+        public Client()
+		{
+			this.currencyList = new List<string>();
+			this.currencyAmount = new List<int>();
+		}
 
-        public Client(string firstname,string lastname,string mainCurrency) 
+        public Client(string firstname,string lastname,string mainCurrency) //used to create entirely new client
 		{
 			this.guid = Guid.NewGuid().ToString();
 			this.firstName = firstname;
 			this.lastName = lastname;
 			this.pin = 0;
 			this.mainCurrency = mainCurrency;
+			this.currencyList = new List<string>();
+			this.currencyAmount = new List<int>();
 			this.currencyList.Add(mainCurrency);
 			this.currencyAmount.Add(0);
 		}
 
-		public Client(Guid guid, string firstname, string lastname, string mainCurrency, int pin)
+		public Client(Guid guid, string firstname, string lastname, string mainCurrency, int pin) //actually used to copy client
 		{
 			this.guid = guid.ToString();
 			this.firstName = firstname;
 			this.lastName = lastname;
 			this.mainCurrency = mainCurrency;
 			this.pin = pin;
-			this.currencyList.Add(mainCurrency);
-			this.currencyAmount.Add(0);
+			this.currencyList = new List<string>();
+			this.currencyAmount = new List<int>();
 		}
 
 		public override String ToString()

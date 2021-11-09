@@ -89,7 +89,9 @@ namespace Bank
 
         public void ChangePIN(Guid guid )
         {
+            int pin = Admin.AskUserForPIN();
             Client c = returnClientFromGuid(guid);
+            c.pin = pin;
             UpdateClient(c);
         }
 
@@ -127,7 +129,7 @@ namespace Bank
 
         public bool UpdateJson()
         {
-            string json = JsonConvert.SerializeObject(AllClientJSONData.Client.ToArray(),Formatting.Indented);
+            string json = JsonConvert.SerializeObject(AllClientJSONData,Formatting.Indented);
             string url = Admin.ReturnDirectory() + "\\Json\\ClientList.json";
             try
             {
@@ -150,7 +152,7 @@ namespace Bank
         internal void BlockClient(Guid guid)
         {
             Client c = returnClientFromGuid(guid);
-            c.blocked = false;
+            c.blocked = true;
             UpdateClient(c);
         }
 
@@ -164,6 +166,11 @@ namespace Bank
         public Guid getClientGuid(int selectedClient)
         {
             return Guid.Parse(AllClientJSONData.Client[selectedClient].guid);
+        }
+
+        public int UpdateClientNumber()
+        {
+            return AllClientJSONData.Client.Count();
         }
 
         public void UpdateClient(Client c)

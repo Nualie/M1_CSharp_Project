@@ -23,7 +23,7 @@ namespace Bank
         {
             sql = new ClientDBAccess();
             json = new ClientJsonAccess();
-            ClientNum = json.AllClientJSONData.Client.Count();
+            ClientNum = 2; //json.AllClientJSONData.Client.Count();
         }
 
         public bool RequestDBAccess()
@@ -47,14 +47,16 @@ namespace Bank
         public void Menu()
         {
             string choice = "0";
+            Console.WriteLine("Welcome, Administrator.");
             while (choice != "12")
             {
 
-            Console.WriteLine($"Welcome, Administrator.\nDatabase access:{DBaccess}\nType in an action id.");
-            Console.WriteLine("0.Request SQLite database access.\n1.View all clients.\n2.Create a client.\n3.Delete a client." +
+            Console.WriteLine($"\nDatabase access: {DBaccess}\nType in an action id.");
+            Console.WriteLine("\n0.Request SQLite database access.\n1.View all clients.\n2.Create a client.\n3.Delete a client." +
                 "\n4.Change a client's PIN.\n5.List all accounts by GUID\n6.Reset the database from JSON\n7.Reset JSON from database"+
-                "\n8.Reset client tries\n9.Block client\n10.Unblock client\n11.Turn off database access\n12.Quit");
+                "\n8.Reset client tries\n9.Block client\n10.Unblock client\n11.Turn off database access\n12.Quit\n");
             choice = Console.ReadLine();
+            Console.WriteLine();
             switch (choice)
             {
                 case "0":
@@ -199,6 +201,7 @@ namespace Bank
             {
                 json.GetClientData(); 
             }
+            Console.WriteLine();
         }
 
         public void DeleteClient()
@@ -277,6 +280,15 @@ namespace Bank
             Console.WriteLine("\nEnter the number of the client you want to manage.");
 
             string read = Console.ReadLine();
+
+            if (DBaccess)
+            {
+                ClientNum = sql.UpdateClientNumber();
+            }
+            else
+            {
+                ClientNum = json.UpdateClientNumber();
+            }
 
             if (Int32.TryParse(read, out int n) && n >= 0 && n<ClientNum)
             {

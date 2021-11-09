@@ -1,27 +1,34 @@
-{
-	"Client": [
-		{
-			"guid": "663fbf75-98bf-4d14-a1e7-c7bd9ce0d46b",
-			"firstname": "Bob",
-			"lastname": "Lennon",
-			"pin": 1234,
-			"blocked": false,
-			"tries": 3,
-			"currencyList": [ "EUR", "USD" ],
-			"currencyAmount": [ 1000,200 ],
-			"mainCurrency": "EUR"
-		},
-		{
-			"guid": "bfdbee96-e65a-4c43-894e-2e656a21729b",
-			"firstname": "Jean",
-			"lastname": "Lennon",
-			"pin": 5678,
-			"blocked": false,
-			"tries": 3,
-			"currencyList": [ "EUR", "USD" ],
-			"currencyAmount": [ 100, 2000 ],
-			"mainCurrency": "USD"
-		}
-	]
+﻿{
+  "Client": [
+    {
+      "guid": "5f146025-d57d-4454-a6fe-5172a02a0c56",
+      "firstName": "Hilda",
+      "lastName": "Michaelis",
+      "pin": 5678,
+      "tries": 3,
+      "blocked": false,
+      "currencyList": [
+        "EUR"
+      ],
+      "currencyAmount": [
+        0
+      ],
+      "mainCurrency": "EUR"
+    },
+    {
+      "guid": "ebe1b521-1358-43c2-919c-22571e692b73",
+      "firstName": "Kate",
+      "lastName": "Mirror",
+      "pin": 7834,
+      "tries": 3,
+      "blocked": false,
+      "currencyList": [
+        "EUR"
+      ],
+      "currencyAmount": [
+        0
+      ],
+      "mainCurrency": "EUR"
+    }
+  ]
 }
-
