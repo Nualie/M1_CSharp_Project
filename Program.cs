@@ -17,29 +17,27 @@ namespace Bank
     {
         static void Main()
         {
-            /*
+            Admin admin = new Admin();
+            
             Console.WriteLine("Welcome, administrator.\nPlease enter username:");
             string username = Console.ReadLine();
             Console.WriteLine("Please enter password:");
             string password = Console.ReadLine();
 
-            while (!Admin.login(username,password))
+            while (!admin.login(username,password))
             {
                 Console.WriteLine("Wrong username and/or password. Please try again.");
                 Console.WriteLine("\n(Tip: enter admin, password)\nPlease enter username:");
                 username = Console.ReadLine();
                 Console.WriteLine("Please enter password:");
                 password = Console.ReadLine();
-            }*/
-
-            Admin admin = new Admin();
+            }
+            
             admin.Menu();
 
 
         }
 
-       
- 
 
     }
 

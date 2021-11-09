@@ -19,6 +19,10 @@ namespace Bank
 
         public bool DBaccess = false;
 
+        string username = "admin";
+
+        string password = "password";
+
         public Admin()
         {
             sql = new ClientDBAccess();
@@ -299,9 +303,9 @@ namespace Bank
             return false;
         }
 
-        public static bool login(string username, string password)
+        public bool login(string username, string password)
         {
-            if (username == "admin" && password == "password")
+            if (username == this.username && password == this.password)
             {
                 return true;
             }
